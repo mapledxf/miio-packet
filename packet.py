@@ -29,6 +29,7 @@ class Packet:
 		if(not self.checkPacket(hellohex, True)):
 			print("Error: failed to parse hello packet")
 			return
+			
 		print("Got hello response: %s" % hellohex)
 		self.device_type = hellohex[16:20]
 		self.serial = hellohex[20:24]
@@ -55,6 +56,9 @@ class Packet:
 		if parameters is not None:
 			cmd["params"] = parameters
 		msg = self.encodeMsg(cmd)
+		if(msg is None):
+			return
+
 		response = self.send(msg)
 
 		if(response is None):
@@ -90,14 +94,14 @@ class Packet:
 			return False
 		return True
 	def md5(self, data: bytes) -> bytes:
-        checksum = hashlib.md5()
-        checksum.update(data)
-        return checksum.digest()
+		checksum = hashlib.md5()
+		checksum.update(data)
+		return checksum.digest()
 
 	def encodeMsg(self, command: dict) -> bytes:
 		if(self.token is None):
 			print("Error: token is None")
-			return
+			return None
 
 		shell = 'echo \'' + json.dumps(command) + '\' |  openssl enc -aes-128-cbc -K ' + self.key.hex() + ' -iv ' + self.iv.hex() + ' -nosalt | hexdump -ve \'/1 "%02x"\''
 		encrypt = bytes.fromhex(subprocess.Popen(shell, shell=True, stdout=subprocess.PIPE).stdout.read().decode('utf-8'))
@@ -120,7 +124,4 @@ class Packet:
 		result = json.loads(decrypt)
 		return result['result']
 
-
-packet = Packet('192.168.31.48')
-print(packet.sendCmd('get_prop', ['power']))
 
