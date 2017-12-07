@@ -74,17 +74,17 @@ class Packet:
 		if((not ciphertext.startswith(Packet.magic)) or len(ciphertext) < 64):
 			print("Error: not a miio packet")
 			return False
-		length = int(ciphertext[4:8], 16)
-
-		if(isHello):
-			length += 32
-		else:
-			length += 64
-
-		if(not len(ciphertext) == length):
-			print("Error: length not match: %s but %s found" % (length, len(ciphertext)))
-			return False
-
+#		length = int(ciphertext[4:8], 16)
+#
+#		if(isHello):
+#			length += 32
+#		else:
+#			length += 64
+#
+#		if(not len(ciphertext) == length):
+#			print("Error: length not match: %s but %s found" % (length, len(ciphertext)))
+#			return False
+#
 		if(isHello):
 			return True
 
@@ -115,7 +115,7 @@ class Packet:
 
 	def decodeMsg(self, ciphertext: str) -> str:
 		if(not self.checkPacket(ciphertext, False)):
-			print("Error: failed to decode packet %s " % response)
+			print("Error: failed to decode packet %s " % ciphertext)
 			return None
 
 		base64_cipher = base64.b64encode(bytes.fromhex(ciphertext[64:len(ciphertext)])).decode("utf-8") 
